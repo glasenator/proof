@@ -10,7 +10,12 @@ import {
     isLoseDialogVisible,
     showWinDialog,
     showLoseDialog,
-    isGameInProgress
+    isGameInProgress,
+    walls,
+    addWall,
+    isValidMove,
+    cameraFlashPos,
+    clearCameraFlash
 } from './gameState.js';
 import { renderGrid } from './render.js';
 
@@ -47,30 +52,94 @@ function moveBigfoot() {
 }
 
 // Move FBI to a random orthogonal cell
-function moveFbi() {
+export function moveFbi() {
     const directions = [
         { x: 0, y: -1 }, // Up
         { x: 0, y: 1 },  // Down
         { x: -1, y: 0 }, // Left
         { x: 1, y: 0 }   // Right
     ];
+
+    // If there's a camera flash, move towards it
+    if (cameraFlashPos) {
+        // Calculate the best move to get closer to the flash
+        const dx = cameraFlashPos.x - fbiPos.x;
+        const dy = cameraFlashPos.y - fbiPos.y;
+        
+        // Prioritize the direction with the larger difference
+        let move;
+        if (Math.abs(dx) > Math.abs(dy)) {
+            move = { x: Math.sign(dx), y: 0 };
+        } else {
+            move = { x: 0, y: Math.sign(dy) };
+        }
+
+        // Check if the move is valid
+        const newX = fbiPos.x + move.x;
+        const newY = fbiPos.y + move.y;
+        
+        if (newX >= 0 && newX < gridSize && 
+            newY >= 0 && newY < gridSize && 
+            isValidMove(fbiPos, { x: newX, y: newY })) {
+            
+            // Store current position before moving
+            previousFbiPos.x = fbiPos.x;
+            previousFbiPos.y = fbiPos.y;
+            
+            // Update FBI position
+            fbiPos.x = newX;
+            fbiPos.y = newY;
+
+            // If FBI reaches the flash, clear it
+            if (fbiPos.x === cameraFlashPos.x && fbiPos.y === cameraFlashPos.y) {
+                clearCameraFlash();
+            }
+            
+            return;
+        }
+    }
+
+    // If no flash or can't move towards it, move randomly
     const validMoves = directions.filter(dir => {
         const newX = fbiPos.x + dir.x;
         const newY = fbiPos.y + dir.y;
-        return (
-            newX >= 0 && newX < gridSize &&
-            newY >= 0 && newY < gridSize &&
-            !(newX === previousFbiPos.x && newY === previousFbiPos.y) &&
-            !(newX === bigfootPos.x && newY === bigfootPos.y)
-        );
-    });
-    const move = validMoves[Math.floor(Math.random() * validMoves.length)];
+        
+        // Check if the move is within bounds
+        if (newX < 0 || newX >= gridSize || newY < 0 || newY >= gridSize) {
+            return false;
+        }
 
-    // Update positions by modifying the object properties instead of reassigning
-    previousFbiPos.x = fbiPos.x;
-    previousFbiPos.y = fbiPos.y;
-    fbiPos.x += move.x;
-    fbiPos.y += move.y;
+        // Check if the move would hit a wall (except for FBI)
+        if (!isValidMove(fbiPos, { x: newX, y: newY })) {
+            return false;
+        }
+
+        // Don't move to the previous position
+        if (newX === previousFbiPos.x && newY === previousFbiPos.y) {
+            return false;
+        }
+
+        return true;
+    });
+
+    if (validMoves.length > 0) {
+        // Store current position before moving
+        previousFbiPos.x = fbiPos.x;
+        previousFbiPos.y = fbiPos.y;
+        
+        // Choose a random valid move
+        const move = validMoves[Math.floor(Math.random() * validMoves.length)];
+        
+        // Update FBI position
+        fbiPos.x += move.x;
+        fbiPos.y += move.y;
+
+        // Check for collision with Bigfoot
+        if (fbiPos.x === bigfootPos.x && fbiPos.y === bigfootPos.y) {
+            // Create a wall between FBI and Bigfoot
+            addWall(fbiPos, bigfootPos);
+        }
+    }
 }
 
 // Update the "This Space" display
@@ -102,14 +171,6 @@ function updateSpaceDisplay() {
 
 // Check for collisions
 function checkCollisions() {
-    // Check win condition
-    if (playerPos.x === bigfootPos.x && playerPos.y === bigfootPos.y) {
-        console.log('Win condition met!', { playerPos, bigfootPos }); // Debug log
-        renderGrid();
-        showWinDialog();
-        return true;
-    }
-
     // Check lose condition
     if (playerPos.x === fbiPos.x && playerPos.y === fbiPos.y) {
         renderGrid();
