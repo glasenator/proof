@@ -1,0 +1,177 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-color: #2b3e50; /* Dark forest green */
+    color: #d4e157; /* Light green for text */
+}
+
+h1 {
+    margin-top: 20px;
+    color: #c8e6c9; /* Soft green */
+}
+
+#game-container {
+    display: grid;
+    grid-template-columns: repeat(5, 50px);
+    grid-template-rows: repeat(5, 50px);
+    gap: 5px;
+    justify-content: center;
+    background-color: #1b2a38; /* Darker green for grid background */
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #000;
+}
+
+.cell {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #4caf50; /* Green border */
+    background-color: #37474f; /* Dark gray for cells */
+    font-size: 20px;
+    font-weight: bold;
+    color: #d4e157; /* Light green for text */
+}
+
+.cell.player {
+    background-color: #81c784; /* Light green for player */
+    color: #fff;
+}
+
+.cell.bigfoot {
+    background-color: #6a4f4b; /* Brown for Bigfoot */
+    color: #fff;
+}
+
+.cell.fbi {
+    background-color: #d32f2f; /* Red for FBI */
+    color: #fff;
+}
+
+.cell.footprint {
+    color: #ffcc80; /* Orange for footprints */
+}
+
+.cell.footprint.up {
+    transform: rotate(0deg);
+}
+
+.cell.footprint.down {
+    transform: rotate(180deg);
+}
+
+.cell.footprint.left {
+    transform: rotate(270deg);
+}
+
+.cell.footprint.right {
+    transform: rotate(90deg);
+}
+
+p {
+    color: #c8e6c9; /* Soft green for instructions */
+}
+
+#footprint-display {
+    width: 80px;
+    height: 80px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #4caf50; /* Green border */
+    background-color: #37474f; /* Dark gray for cells */
+    font-size: 20px;
+    font-weight: bold;
+    color: #d4e157; /* Light green for text */
+}
+
+#footprint-display.up {
+    transform: rotate(0deg);
+}
+
+#footprint-display.down {
+    transform: rotate(180deg);
+}
+
+#footprint-display.left {
+    transform: rotate(270deg);
+}
+
+#footprint-display.right {
+    transform: rotate(90deg);
+}
+
+.dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.dialog-content {
+    background-color: #2b3e50;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#next-level-btn {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+#next-level-btn:hover {
+    background-color: #45a049;
+}
+
+#restart-btn {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+#restart-btn:hover {
+    background-color: #1976D2;
+}
+
+.icon-celebration {
+    font-size: 64px;
+    margin: 20px 0;
+    animation: iconDance 2s infinite;
+    transform-origin: center;
+}
+
+@keyframes iconDance {
+    0% {
+        transform: rotate(-10deg);
+    }
+    50% {
+        transform: rotate(10deg);
+    }
+    100% {
+        transform: rotate(-10deg);
+    }
+}
