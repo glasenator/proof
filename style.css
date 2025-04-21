@@ -156,3 +156,22 @@ p {
 #restart-btn:hover {
     background-color: #1976D2;
 }
+
+.icon-celebration {
+    font-size: 64px;
+    margin: 20px 0;
+    animation: iconDance 2s infinite;
+    transform-origin: center;
+}
+
+@keyframes iconDance {
+    0% {
+        transform: rotate(-10deg);
+    }
+    50% {
+        transform: rotate(10deg);
+    }
+    100% {
+        transform: rotate(-10deg);
+    }
+}

@@ -68,16 +68,24 @@ function renderGrid() {
             const cell = document.createElement('div');
             cell.classList.add('cell');
 
-            if (playerPos.x === x && playerPos.y === y) {
-                cell.classList.add('player');
-                cell.textContent = '🕵️'; // Use emoji for Player
-            } else if (bigfootPos.x === x && bigfootPos.y === y) {
+            // Check if this is the exact collision cell
+            const isCollisionCell = x === playerPos.x && y === playerPos.y && 
+                                  playerPos.x === bigfootPos.x && playerPos.y === bigfootPos.y;
+            
+            if (isCollisionCell) {
+                // Show Bigfoot in the collision cell
                 cell.classList.add('bigfoot');
-                cell.textContent = '🦧'; // Use emoji for Bigfoot
+                cell.textContent = '🦧';
+            } else if (playerPos.x === x && playerPos.y === y) {
+                // Show player in their cell
+                cell.classList.add('player');
+                cell.textContent = '🕵️';
             } else if (fbiPos.x === x && fbiPos.y === y) {
+                // Show FBI in their cell
                 cell.classList.add('fbi');
-                cell.textContent = '👮'; // Use emoji for FBI
+                cell.textContent = '👮';
             } else {
+                // Show footprints if present
                 const footprint = footprints.find(f => f.x === x && f.y === y);
                 if (footprint) {
                     cell.classList.add('footprint', footprint.class);
