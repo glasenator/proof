@@ -13,6 +13,23 @@
         <div id="info-box">
             <h2>This Space</h2>
             <div id="footprint-display" style="font-size: 24px; color: #ffcc80;"></div>
+            <div id="level-counter" style="margin-top: 20px;">
+                <h2>Level: <span id="level">1</span></h2>
+            </div>
+        </div>
+    </div>
+    <div id="level-up-dialog" class="dialog" style="display: none;">
+        <div class="dialog-content">
+            <h2>Level Complete!</h2>
+            <p>You found Bigfoot!</p>
+            <button id="next-level-btn">Next Level</button>
+        </div>
+    </div>
+    <div id="game-over-dialog" class="dialog" style="display: none;">
+        <div class="dialog-content">
+            <h2>Game Over!</h2>
+            <p>You reached level <span id="final-level">1</span></p>
+            <button id="restart-btn">Play Again</button>
         </div>
     </div>
     <p>Use the arrow keys to move. Find Bigfoot to win!</p>

@@ -1,15 +1,67 @@
-const gridSize = 5;
+const initialGridSize = 5;
+let gridSize = initialGridSize;
+let level = 1;
 let playerPos = { x: 0, y: 0 };
 let bigfootPos = { x: 4, y: 4 };
 let previousBigfootPos = { x: 4, y: 4 }; // Track Bigfoot's previous position
 let fbiPos = { x: 2, y: 2 }; // Initial position of the FBI
 let previousFbiPos = { x: 2, y: 2 }; // Track FBI's previous position
 let footprints = [];
+let isWinDialogVisible = false; // Track if level-up dialog is visible
+let isLoseDialogVisible = false; // Track if game-over dialog is visible
+
+// Function to place Bigfoot in a random unoccupied cell
+function placeBigfoot() {
+    let x, y;
+    do {
+        x = Math.floor(Math.random() * gridSize);
+        y = Math.floor(Math.random() * gridSize);
+    } while ((x === playerPos.x && y === playerPos.y) || (x === fbiPos.x && y === fbiPos.y));
+    
+    return { x, y };
+}
+
+// Function to reset the game state for a new level
+function resetLevel() {
+    // Clear the game container
+    const container = document.getElementById('game-container');
+    container.innerHTML = '';
+    
+    // Reset positions
+    const middleX = Math.floor(gridSize / 2);
+    playerPos = { x: middleX, y: gridSize - 1 }; // Bottom middle cell
+    fbiPos = { x: middleX, y: 0 }; // Top middle cell
+    previousFbiPos = { ...fbiPos };
+    bigfootPos = placeBigfoot();
+    previousBigfootPos = { ...bigfootPos };
+    
+    // Reset game state
+    footprints = [];
+    
+    // Update level display
+    document.getElementById('level').textContent = level;
+    document.getElementById('footprint-display').textContent = '';
+    document.getElementById('footprint-display').className = '';
+    
+    // Render the new grid
+    renderGrid();
+}
+
+// Function to start next level
+function startNextLevel() {
+    level++;
+    gridSize = initialGridSize + (level - 1) * 2;
+    isWinDialogVisible = false; // Reset win dialog visibility
+    resetLevel();
+    document.getElementById('level-up-dialog').style.display = 'none';
+}
 
 // Render the grid in the HTML
 function renderGrid() {
     const container = document.getElementById('game-container');
-    container.innerHTML = ''; // Clear previous grid
+    container.innerHTML = '';
+    container.style.gridTemplateColumns = `repeat(${gridSize}, 50px)`;
+    container.style.gridTemplateRows = `repeat(${gridSize}, 50px)`;
 
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
@@ -73,8 +125,9 @@ function moveBigfoot() {
     if (playerPos.x === bigfootPos.x && playerPos.y === bigfootPos.y) {
         renderGrid();
         setTimeout(() => {
-            alert("You found Bigfoot! You win!");
-        }, 50); // Slight delay to ensure rendering completes
+            isWinDialogVisible = true; // Set dialog as visible
+            document.getElementById('level-up-dialog').style.display = 'flex';
+        }, 50);
     }
 }
 
@@ -108,15 +161,31 @@ function moveFbi() {
     if (playerPos.x === fbiPos.x && playerPos.y === fbiPos.y) {
         renderGrid();
         setTimeout(() => {
-            alert("The FBI caught you! You lose!");
-        }, 50); // Slight delay to ensure rendering completes
+            isLoseDialogVisible = true;
+            document.getElementById('final-level').textContent = level;
+            document.getElementById('game-over-dialog').style.display = 'flex';
+        }, 50);
     }
+}
+
+// Function to restart the game
+function restartGame() {
+    level = 1;
+    gridSize = initialGridSize;
+    isWinDialogVisible = false;
+    isLoseDialogVisible = false;
+    resetLevel();
+    document.getElementById('game-over-dialog').style.display = 'none';
 }
 
 // Handle player movement
 function movePlayer(dx, dy) {
+    // Don't allow movement while dialog is visible
+    if (isWinDialogVisible || isLoseDialogVisible) return;
+    
     const newX = playerPos.x + dx;
     const newY = playerPos.y + dy;
+    
     if (newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize) {
         playerPos.x = newX;
         playerPos.y = newY;
@@ -126,18 +195,19 @@ function movePlayer(dx, dy) {
         const footprintDisplay = document.getElementById('footprint-display');
         footprintDisplay.className = ''; // Clear existing classes
         if (footprint) {
-            footprintDisplay.textContent = footprint.symbol; // Display the footprint emoji
-            footprintDisplay.classList.add(footprint.class); // Apply the correct rotation class
+            footprintDisplay.textContent = footprint.symbol;
+            footprintDisplay.classList.add(footprint.class);
         } else {
-            footprintDisplay.textContent = ''; // Clear the display if no footprint
+            footprintDisplay.textContent = '';
         }
 
         // Check win condition
         if (playerPos.x === bigfootPos.x && playerPos.y === bigfootPos.y) {
             renderGrid();
             setTimeout(() => {
-                alert("You found Bigfoot! You win!");
-            }, 50); // Slight delay to ensure rendering completes
+                isDialogVisible = true;
+                document.getElementById('level-up-dialog').style.display = 'flex';
+            }, 50);
             return;
         }
 
@@ -145,8 +215,10 @@ function movePlayer(dx, dy) {
         if (playerPos.x === fbiPos.x && playerPos.y === fbiPos.y) {
             renderGrid();
             setTimeout(() => {
-                alert("The FBI caught you! You lose!");
-            }, 50); // Slight delay to ensure rendering completes
+                isDialogVisible = true;
+                document.getElementById('final-level').textContent = level;
+                document.getElementById('game-over-dialog').style.display = 'flex';
+            }, 50);
             return;
         }
 
@@ -174,5 +246,9 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// Add event listeners for dialog buttons
+document.getElementById('next-level-btn').addEventListener('click', startNextLevel);
+document.getElementById('restart-btn').addEventListener('click', restartGame);
+
 // Start the game
-renderGrid();
+resetLevel();
