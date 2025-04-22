@@ -7,14 +7,14 @@ import {
 import { renderGrid } from './render.js';
 
 let isCameraActive = false;
+let buttonsDisabled = false;
 
 function activateCamera() {
-    if (isCameraActive) return; // Don't activate if already active
+    if (isCameraActive || buttonsDisabled) return;
     
     isCameraActive = true;
     highlightClickableCells();
     
-    // Disable the camera button
     const cameraBtn = document.getElementById('camera-btn');
     cameraBtn.disabled = true;
     
@@ -27,13 +27,8 @@ function deactivateCamera() {
     isCameraActive = false;
     removeHighlightFromCells();
     
-    // Re-enable the camera button
-    const cameraBtn = document.getElementById('camera-btn');
-    cameraBtn.disabled = false;
-    
-    // Re-enable telescope button
-    const telescopeBtn = document.getElementById('telescope-btn');
-    telescopeBtn.disabled = false;
+    // Keep buttons disabled until next move
+    buttonsDisabled = true;
 }
 
 function highlightClickableCells() {
@@ -88,6 +83,15 @@ function handleCellClick(event) {
 // Add event listeners
 document.getElementById('camera-btn').addEventListener('click', activateCamera);
 document.getElementById('game-container').addEventListener('click', handleCellClick);
+
+// Export function to re-enable buttons
+export function enableButtons() {
+    buttonsDisabled = false;
+    const cameraBtn = document.getElementById('camera-btn');
+    const telescopeBtn = document.getElementById('telescope-btn');
+    cameraBtn.disabled = false;
+    telescopeBtn.disabled = false;
+}
 
 export {
     isCameraActive,

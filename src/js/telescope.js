@@ -6,11 +6,13 @@ import {
     revealedBigfootPos
 } from './gameState.js';
 import { renderGrid } from './render.js';
+import { moveBigfoot, moveFbi } from './movement.js';
 
 let isTelescopeActive = false;
+let buttonsDisabled = false;
 
 function activateTelescope() {
-    if (isTelescopeActive) return;
+    if (isTelescopeActive || buttonsDisabled) return;
     
     isTelescopeActive = true;
     highlightBorderCells();
@@ -27,12 +29,8 @@ function deactivateTelescope() {
     isTelescopeActive = false;
     removeHighlightFromCells();
     
-    const telescopeBtn = document.getElementById('telescope-btn');
-    telescopeBtn.disabled = false;
-    
-    // Re-enable camera button
-    const cameraBtn = document.getElementById('camera-btn');
-    cameraBtn.disabled = false;
+    // Keep buttons disabled until next move
+    buttonsDisabled = true;
 }
 
 function highlightBorderCells() {
@@ -105,6 +103,11 @@ function handleCellClick(event) {
             revealedBigfootPos.y = currentY;
             renderGrid();
             deactivateTelescope();
+            
+            // Move Bigfoot and FBI after revealing Bigfoot
+            moveBigfoot();
+            moveFbi();
+            renderGrid();
             return;
         }
 
@@ -126,11 +129,25 @@ function handleCellClick(event) {
     }
 
     deactivateTelescope();
+    
+    // Move Bigfoot and FBI after telescope use
+    moveBigfoot();
+    moveFbi();
+    renderGrid();
 }
 
 // Add event listeners
 document.getElementById('telescope-btn').addEventListener('click', activateTelescope);
 document.getElementById('game-container').addEventListener('click', handleCellClick);
+
+// Export function to re-enable buttons
+export function enableButtons() {
+    buttonsDisabled = false;
+    const cameraBtn = document.getElementById('camera-btn');
+    const telescopeBtn = document.getElementById('telescope-btn');
+    cameraBtn.disabled = false;
+    telescopeBtn.disabled = false;
+}
 
 export {
     isTelescopeActive,

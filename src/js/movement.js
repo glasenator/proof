@@ -14,6 +14,8 @@ import {
     revealedBigfootPos
 } from './gameState.js';
 import { renderGrid } from './render.js';
+import { enableButtons as enableCameraButtons } from './camera.js';
+import { enableButtons as enableTelescopeButtons } from './telescope.js';
 
 // Move Bigfoot to a random orthogonal cell
 export function moveBigfoot() {
@@ -200,6 +202,10 @@ export function movePlayer(dx, dy) {
             // Update the space display again in case Bigfoot or FBI moved to the player's position
             updateSpaceDisplay();
         }
+        
+        // Re-enable camera and telescope buttons
+        enableCameraButtons();
+        enableTelescopeButtons();
         
         renderGrid();
     }

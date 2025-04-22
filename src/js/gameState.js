@@ -1,4 +1,5 @@
 import { renderGrid } from './render.js';
+import { moveBigfoot } from './movement.js';
 
 // Game state variables
 export let gridSize = 5;
@@ -53,6 +54,11 @@ export function resetLevel() {
     // Update grid size
     container.style.gridTemplateColumns = `repeat(${gridSize}, 50px)`;
     container.style.gridTemplateRows = `repeat(${gridSize}, 50px)`;
+    
+    // Add initial footprints based on level
+    for (let i = 0; i < level; i++) {
+        moveBigfoot();
+    }
 }
 
 // Function to start next level

@@ -4,7 +4,8 @@ import {
     bigfootPos,
     fbiPos,
     footprints,
-    revealedBigfootPos
+    revealedBigfootPos,
+    cameraFlashPos
 } from './gameState.js';
 
 // Render the grid in the HTML
@@ -17,11 +18,17 @@ export function renderGrid() {
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
             const cell = document.createElement('div');
-            cell.classList.add('cell');
+            cell.className = 'cell';
             cell.dataset.x = x;
             cell.dataset.y = y;
 
-            // Add content to cell
+            // Add camera flash if this is the flash position
+            if (cameraFlashPos && x === cameraFlashPos.x && y === cameraFlashPos.y) {
+                cell.classList.add('camera-flash');
+                cell.textContent = '✨';
+            }
+
+            // Add player
             if (x === playerPos.x && y === playerPos.y) {
                 cell.classList.add('player');
                 cell.textContent = '🕵️';
