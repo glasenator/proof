@@ -9,13 +9,31 @@ import { renderGrid } from './render.js';
 let isCameraActive = false;
 
 function activateCamera() {
+    if (isCameraActive) return; // Don't activate if already active
+    
     isCameraActive = true;
     highlightClickableCells();
+    
+    // Disable the camera button
+    const cameraBtn = document.getElementById('camera-btn');
+    cameraBtn.disabled = true;
+    
+    // Disable telescope button
+    const telescopeBtn = document.getElementById('telescope-btn');
+    telescopeBtn.disabled = true;
 }
 
 function deactivateCamera() {
     isCameraActive = false;
     removeHighlightFromCells();
+    
+    // Re-enable the camera button
+    const cameraBtn = document.getElementById('camera-btn');
+    cameraBtn.disabled = false;
+    
+    // Re-enable telescope button
+    const telescopeBtn = document.getElementById('telescope-btn');
+    telescopeBtn.disabled = false;
 }
 
 function highlightClickableCells() {
@@ -45,12 +63,17 @@ function handleCellClick(event) {
     const x = parseInt(cell.dataset.x);
     const y = parseInt(cell.dataset.y);
     
+    // Don't allow clicking on the player's cell
+    if (x === playerPos.x && y === playerPos.y) {
+        return;
+    }
+    
     // Check if the clicked cell is in the same row or column as the player
     if (x === playerPos.x || y === playerPos.y) {
         // Create camera flash at player's position
         setCameraFlash(playerPos.x, playerPos.y);
         
-        // If Bigfoot is in the clicked cell, player wins
+        // If Bigfoot is in the clicked cell, reveal him and win
         if (x === bigfootPos.x && y === bigfootPos.y) {
             cell.classList.add('bigfoot');
             cell.textContent = '🦧';

@@ -1,7 +1,7 @@
 import { renderGrid } from './render.js';
 
-let initialGridSize = 5;
-export let gridSize = initialGridSize;
+// Game state variables
+export let gridSize = 5;
 export let level = 1;
 export let playerPos = { x: 2, y: 4 };
 export let bigfootPos = { x: 2, y: 2 };
@@ -9,10 +9,10 @@ export let previousBigfootPos = { x: 2, y: 2 };
 export let fbiPos = { x: 2, y: 0 };
 export let previousFbiPos = { x: 2, y: 0 };
 export let footprints = [];
-export let walls = [];
 export let isWinDialogVisible = false;
 export let isLoseDialogVisible = false;
 export let cameraFlashPos = null; // Track the position of the camera flash
+export let revealedBigfootPos = { x: null, y: null };
 
 // Function to place Bigfoot in a random unoccupied cell
 export function placeBigfoot() {
@@ -41,7 +41,6 @@ export function resetLevel() {
     
     // Reset game state
     footprints = [];
-    walls = [];
     isWinDialogVisible = false;
     isLoseDialogVisible = false;
     cameraFlashPos = null; // Reset camera flash
@@ -64,7 +63,7 @@ export function startNextLevel() {
     
     // Increment level and update grid size
     level++;
-    gridSize = initialGridSize + (level - 1) * 2;
+    gridSize = 5 + (level - 1) * 2;
     
     // Reset the game state
     resetLevel();
@@ -81,7 +80,7 @@ export function restartGame() {
     
     // Reset level and grid size
     level = 1;
-    gridSize = initialGridSize;
+    gridSize = 5;
     
     // Reset the game state
     resetLevel();
@@ -90,57 +89,14 @@ export function restartGame() {
     renderGrid();
 }
 
-// Function to check if a wall exists between two positions
-export function hasWall(pos1, pos2) {
-    return walls.some(wall => 
-        (wall.x1 === pos1.x && wall.y1 === pos1.y && wall.x2 === pos2.x && wall.y2 === pos2.y) ||
-        (wall.x1 === pos2.x && wall.y1 === pos2.y && wall.x2 === pos1.x && wall.y2 === pos1.y)
-    );
+// Function to set camera flash position
+export function setCameraFlash(x, y) {
+    cameraFlashPos = { x, y };
 }
 
-// Function to add a wall between two positions
-export function addWall(pos1, pos2) {
-    // Only create walls between Bigfoot and FBI
-    if ((pos1 === bigfootPos && pos2 === fbiPos) || (pos1 === fbiPos && pos2 === bigfootPos)) {
-        // Determine which side to place the wall based on relative positions
-        let wallSide;
-        if (pos1.x === pos2.x) {
-            // Vertical wall (same column)
-            wallSide = pos1.y < pos2.y ? 'top' : 'bottom';
-        } else {
-            // Horizontal wall (same row)
-            wallSide = pos1.x < pos2.x ? 'left' : 'right';
-        }
-
-        // Check if wall already exists
-        if (!hasWall(pos1, pos2)) {
-            // Create wall in the space between the two positions
-            const wall = {
-                x1: pos1.x,
-                y1: pos1.y,
-                x2: pos2.x,
-                y2: pos2.y,
-                side: wallSide
-            };
-            walls.push(wall);
-            console.log('Created wall between Bigfoot and FBI:', {
-                bigfootPos: { ...bigfootPos },
-                fbiPos: { ...fbiPos },
-                wallSide,
-                wall,
-                walls: [...walls]
-            });
-        }
-    }
-}
-
-// Function to check if a move is valid (not blocked by walls)
-export function isValidMove(fromPos, toPos) {
-    // FBI can move through walls
-    if (fromPos === fbiPos) return true;
-    
-    // Check if there's a wall blocking the move
-    return !hasWall(fromPos, toPos);
+// Function to clear camera flash
+export function clearCameraFlash() {
+    cameraFlashPos = null;
 }
 
 // Functions to handle dialog visibility
@@ -166,18 +122,8 @@ export function isGameInProgress() {
     return !isWinDialogVisible && !isLoseDialogVisible;
 }
 
-// Function to set camera flash position
-export function setCameraFlash(x, y) {
-    cameraFlashPos = { x, y };
-}
-
-// Function to clear camera flash
-export function clearCameraFlash() {
-    cameraFlashPos = null;
-}
-
 // Initialize the game
 export function initializeGame() {
     resetLevel();
     renderGrid();
-} 
+}

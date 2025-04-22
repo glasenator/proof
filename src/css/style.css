@@ -193,6 +193,12 @@ p {
     background-color: #3d8b40;
 }
 
+#camera-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
 /* Clickable cell styles */
 .cell.clickable {
     background-color: #ffcc80;
@@ -202,4 +208,39 @@ p {
 
 .cell.clickable:hover {
     background-color: white;
+}
+
+#telescope-btn {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#telescope-btn:hover {
+    background-color: #45a049;
+}
+
+#telescope-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.clickable {
+    background-color: #ffff00;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.clickable:hover {
+    background-color: #ffcc00;
+}
+
+.cell.telescope-line {
+    background-color: white;
+    transition: background-color 0.3s;
 }

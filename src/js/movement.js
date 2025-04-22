@@ -6,21 +6,17 @@ import {
     fbiPos,
     previousFbiPos,
     footprints,
-    isWinDialogVisible,
-    isLoseDialogVisible,
-    showWinDialog,
     showLoseDialog,
-    isGameInProgress,
-    walls,
-    addWall,
-    isValidMove,
+    showWinDialog,
     cameraFlashPos,
-    clearCameraFlash
+    clearCameraFlash,
+    isGameInProgress,
+    revealedBigfootPos
 } from './gameState.js';
 import { renderGrid } from './render.js';
 
 // Move Bigfoot to a random orthogonal cell
-function moveBigfoot() {
+export function moveBigfoot() {
     const directions = [
         { x: 0, y: -1, symbol: '🦶', class: 'up' },    // Up
         { x: 0, y: 1, symbol: '🦶', class: 'down' },  // Down
@@ -44,7 +40,7 @@ function moveBigfoot() {
         footprints.shift();
     }
 
-    // Update positions by modifying the object properties instead of reassigning
+    // Update positions
     previousBigfootPos.x = bigfootPos.x;
     previousBigfootPos.y = bigfootPos.y;
     bigfootPos.x += move.x;
@@ -78,10 +74,7 @@ export function moveFbi() {
         const newX = fbiPos.x + move.x;
         const newY = fbiPos.y + move.y;
         
-        if (newX >= 0 && newX < gridSize && 
-            newY >= 0 && newY < gridSize && 
-            isValidMove(fbiPos, { x: newX, y: newY })) {
-            
+        if (newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize) {
             // Store current position before moving
             previousFbiPos.x = fbiPos.x;
             previousFbiPos.y = fbiPos.y;
@@ -109,11 +102,6 @@ export function moveFbi() {
             return false;
         }
 
-        // Check if the move would hit a wall (except for FBI)
-        if (!isValidMove(fbiPos, { x: newX, y: newY })) {
-            return false;
-        }
-
         // Don't move to the previous position
         if (newX === previousFbiPos.x && newY === previousFbiPos.y) {
             return false;
@@ -133,12 +121,6 @@ export function moveFbi() {
         // Update FBI position
         fbiPos.x += move.x;
         fbiPos.y += move.y;
-
-        // Check for collision with Bigfoot
-        if (fbiPos.x === bigfootPos.x && fbiPos.y === bigfootPos.y) {
-            // Create a wall between FBI and Bigfoot
-            addWall(fbiPos, bigfootPos);
-        }
     }
 }
 
@@ -182,26 +164,29 @@ function checkCollisions() {
 }
 
 // Handle player movement
-function movePlayer(dx, dy) {
-    // Don't allow movement if game is not in progress
+export function movePlayer(dx, dy) {
     if (!isGameInProgress()) return;
     
     const newX = playerPos.x + dx;
     const newY = playerPos.y + dy;
     
+    // Check if the move is valid
     if (newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize) {
-        // Update player position by modifying the object properties
+        // Reset revealedBigfootPos when player moves
+        revealedBigfootPos.x = null;
+        revealedBigfootPos.y = null;
+        
         playerPos.x = newX;
         playerPos.y = newY;
-
+        
         // Update the space display
         updateSpaceDisplay();
-
+        
         // Check for collisions after player moves
         if (checkCollisions()) {
             return;
         }
-
+        
         // Only move Bigfoot and FBI if the game is still in progress
         if (isGameInProgress()) {
             moveBigfoot();
@@ -214,9 +199,8 @@ function movePlayer(dx, dy) {
             
             // Update the space display again in case Bigfoot or FBI moved to the player's position
             updateSpaceDisplay();
-            renderGrid();
         }
+        
+        renderGrid();
     }
-}
-
-export { movePlayer }; 
+} 

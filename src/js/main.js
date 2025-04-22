@@ -7,22 +7,19 @@ import {
     fbiPos,
     previousFbiPos,
     footprints,
-    walls,
     isWinDialogVisible,
     isLoseDialogVisible,
     showWinDialog,
     showLoseDialog,
     isGameInProgress,
-    isValidMove,
-    addWall,
-    hasWall,
     startNextLevel,
     restartGame,
     initializeGame
 } from './gameState.js';
-import { renderGrid } from './render.js';
 import { movePlayer } from './movement.js';
+import { renderGrid } from './render.js';
 import './camera.js'; // Import camera module
+import './telescope.js';
 
 // Initialize the game
 initializeGame();
